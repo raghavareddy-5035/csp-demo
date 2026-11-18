@@ -1,0 +1,16 @@
+{% extends "base.html" %}{% block body %}
+<div class="card"><h2>Predict your final score</h2>
+<form method="post"><input type="hidden" name="_csrf" value="{{csrf}}"><div class="grid">
+<label>Study hours / day<input name="study_hours" type="number" step="0.1" min="0" max="16" required></label>
+<label>Attendance %<input name="attendance" type="number" step="0.1" min="0" max="100" required></label>
+<label>Sleep hours<input name="sleep_hours" value="{{sensor_sleep or ''}}" type="number" step="0.1" min="0" max="16" required></label>
+<label>Previous score<input name="previous_score" type="number" step="0.1" min="0" max="100" required></label></div>
+<button>Predict</button></form></div>
+{% if result %}<div class="card"><div>Predicted score</div><div class="big">{{result.score}}</div><p>💡 {{result.tip}}</p></div>{% endif %}
+<div class="card"><h3>Connect devices</h3><p>API key for the IoT, desktop and Java clients:</p><code style="word-break:break-all">{{api_key}}</code>{% if sensor_sleep %}<p>😴 Sleep auto-filled from your sensor (7-reading average).</p>{% endif %}<p><a href="/export.csv">Download my predictions (CSV)</a></p></div>
+<div class="card"><h3>Your analytics</h3><p id="sum">No predictions yet.</p><canvas id="c" height="120"></canvas></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script>fetch('/api/stats').then(r=>r.json()).then(s=>{if(!s.history.length)return;
+document.getElementById('sum').textContent=`Average ${s.avg} · Best ${s.best} · Strongest driver: `+(Object.entries(s.corr).sort((a,b)=>Math.abs(b[1])-Math.abs(a[1]))[0]||['n/a'])[0].replace('_',' ');
+new Chart(document.getElementById('c'),{type:'line',data:{labels:s.history.map((_,i)=>i+1),datasets:[{label:'Predicted score',data:s.history,borderColor:'#4f46e5',tension:.3}]}})});</script>
+{% endblock %}
