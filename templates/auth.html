@@ -1,0 +1,7 @@
+{% extends "base.html" %}{% block body %}
+<div class="card"><h2>{{title}}</h2>
+<form method="post"><input type="hidden" name="_csrf" value="{{csrf}}">
+Email<input name="email" type="email" required>
+Password<input name="password" type="password" minlength="8" required>
+<button>{{title}}</button></form>
+<p>{% if title=="Login" %}No account? <a href="/register">Register</a>{% else %}Have one? <a href="/login">Login</a>{% endif %}</p></div>{% endblock %}
